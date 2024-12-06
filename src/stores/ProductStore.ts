@@ -24,41 +24,18 @@ export const useProductStore = defineStore("ProductStore", {
     // Setting up our actions.
     actions: {
         async init() {
-            // Assigning our products to be the initial products list.
+            // get the products from firestore
             console.log("Inside init method")
-            // get reference to our collection and get it and see if size > 1, meaning the collection already exists.
-            const rootCollection = collection(db, '/products');
-            const docs = await getDocs(rootCollection);
-            if (docs.size == 0){
-                console.log("the collecion is empty");
-                // if the collection is empty we need to populate it with the data from initProducts and store it in firebase.
+            const querySnapshot = await getDocs(collection(db, "products"));
+            querySnapshot.forEach((doc) => {
+                this.products.push({ id: doc.id, data: doc.data() as ProductDoc["data"] });
+            });
+
+            // sets products to init products if theres nothing in products after loading from firebase
+            if (this.products.length == 0) {
+                console.log("didn't find products in firebase")
                 this.products = initProducts;
-                this.products.forEach((product) => {
-                    // created the document with the product ID as the primary key.
-                    const docRef = doc(db, "products", product.id);
-                    setDoc(docRef, product.data).then(() => {
-                        console.log('product added was:', product)
-                    })
-                    .catch((err: any) => {
-                        console.log('Rejected adding item:', product, 'due to error:', err);
-                    })
-                    .finally(() => {
-                        console.log('finished')
-                    })
-                });
-            } else {
-                // if the collection is not empty then we load it from firestore
-                console.log("the collection is not empty");
-                // we need to convert each item from firebase object to the correct object type our Array expects.
-                docs.forEach((docSnap: QueryDocumentSnapshot) => {
-                    const productAsProductDocObject = docSnap.data() as ProductDoc;
-                    // now we have correct object type, lets add it to our array.
-                    this.products.push(productAsProductDocObject);
-                })
             }
-            console.log('Root Collection is:', rootCollection); 
-            this.products = initProducts;
-            console.log("End init method")
 
         },
 
