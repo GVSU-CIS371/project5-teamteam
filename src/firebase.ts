@@ -1,6 +1,6 @@
 // USE THIS FILE AS THE GLOBAL FIREBASE DATABASE ACCESS POINT
 import { initializeApp, FirebaseApp } from "firebase/app";
-import { Firestore, getFirestore } from "firebase/firestore";
+import { Firestore, getFirestore, collection, addDoc } from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -18,4 +18,5 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const myApp = initializeApp(firebaseConfig);
-export const db: Firestore = getFirestore(myApp);
+const db: Firestore = getFirestore(myApp);
+export {db , collection, addDoc};

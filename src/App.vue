@@ -105,6 +105,7 @@
   ]);
 
 // start of additions for add dialog feature
+  import {db, collection, addDoc} from "./firebase";
   const addProductDialog = ref(false);
   const newProduct = ref({
     name: "",
@@ -116,10 +117,21 @@
     stock: 0,
   });
 
-  const saveProduct = () => {
-    if (newProduct.value.name && newProduct.value.description && newProduct.value.price > 0) {
+const saveProduct = async () => {
+  if (newProduct.value.name && newProduct.value.description && newProduct.value.price > 0) {
+    try {
+      const docRef = await addDoc(collection(db, "products"), {
+        name: newProduct.value.name,
+        description: newProduct.value.description,
+        image: newProduct.value.imgURL,
+        rating: newProduct.value.rating,
+        price: newProduct.value.price,
+        stock: newProduct.value.stock,
+        category: newProduct.value.category,
+      });
+
       productStore.products.push({
-        id: Date.now().toString(),
+        id: docRef.id,
         data: {
           name: newProduct.value.name,
           description: newProduct.value.description,
@@ -130,13 +142,15 @@
           category: newProduct.value.category,
         },
       });
-      console.log(newProduct.value);
-      addProductDialog.value = false;
 
+      addProductDialog.value = false;
       newProduct.value = { name: "", description: "", rating: 3, price: 0, imgURL: "", stock: 0, category: "" };
-    } else {
-      console.log("info missing");
+    } catch (e) {
+      console.error("Error adding product: ", e);
     }
-  };
+  } else {
+    console.log("info missing");
+  }
+};
 // end of additions for add dialog feature
   </script>
