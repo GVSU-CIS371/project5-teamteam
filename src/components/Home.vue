@@ -17,7 +17,6 @@ import { ref } from "vue";
 import { useProductStore } from "../stores/ProductStore";
 // Assigning product store to our variable 
 const productStore = useProductStore();
-// 
 // has to be reference so vuetify will work properly.
 const prodsArray = ref(productStore.products);
 console.log('products loaded are:', productStore.products);
