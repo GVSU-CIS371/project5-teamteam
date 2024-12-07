@@ -31,12 +31,26 @@ export const useProductStore = defineStore("ProductStore", {
                 this.products.push({ id: doc.id, data: doc.data() as ProductDoc["data"] });
             });
 
-            // sets products to init products if theres nothing in products after loading from firebase
+            // sets products to init products if theres nothing in products after loading from firebase, and stores the items in firebase.
             if (this.products.length == 0) {
                 console.log("didn't find products in firebase")
                 this.products = initProducts;
+                // if the product array was empty then there's nothing in firebase, so we need to update it.
+                this.products.forEach((product) => {
+                    // created the document with the product ID as the primary key.
+                    const docRef = doc(db, "products", product.id);
+                    setDoc(docRef, product.data).then(() => {
+                        console.log('product added was:', product)
+                    })
+                    .catch((err: any) => {
+                        console.log('Rejected adding item:', product, 'due to error:', err);
+                    })
+                    .finally(() => {
+                        console.log('finished uploading to firebase')
+                    })
+                });
             }
-
+            console.log("init finished, Product array is:", this.products);
         },
 
         // string because this is the category we're filtering based off of.

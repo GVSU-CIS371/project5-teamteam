@@ -10,7 +10,6 @@
         </v-col>
     </v-row>
 </template>
-
 <script lang="ts" setup>
 import StoreItem from "./StoreItem.vue";
 import { ref } from "vue";
@@ -18,8 +17,7 @@ import { ref } from "vue";
 import { useProductStore } from "../stores/ProductStore";
 // Assigning product store to our variable 
 const productStore = useProductStore();
-// Calling the function to populating the store with items.
-productStore.init()
+// 
 // has to be reference so vuetify will work properly.
 const prodsArray = ref(productStore.products);
 console.log('products loaded are:', productStore.products);
