@@ -6,7 +6,7 @@ import Groceries from "./components/Groceries.vue";
 import BestSeller from "./components/BestSeller.vue";
 const routes = [
   {
-    path: "/",
+    path: "/all",
     name: "Home",
     props: true,
     component: HomeView,
