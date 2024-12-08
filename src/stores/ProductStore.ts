@@ -28,16 +28,9 @@ export const useProductStore = defineStore("ProductStore", {
             console.log("Inside init method")
             getDocs(collection(db, "products")).then( (querySnapshot) => {
                 if (querySnapshot.size > 0){
-                    querySnapshot.forEach((doc) => {
-                        const docAsProdDoc: ProductDoc = { id: doc.id, data: doc.data() as ProductDoc["data"] };
-                        // if this item isn't in the array already, then add it, else do nothing since it's already in our array.
-                        console.log("docAsProdDocs:", docAsProdDoc)
-                        const isValAlreadyInProdsArray = ((this.products.some( (product) => { console.log("product id:", product.id, "doc id", docAsProdDoc.id, "comparison:", product.id === docAsProdDoc.id); return product.id === docAsProdDoc.id;})))
-                        console.log("is val already in products array:", isValAlreadyInProdsArray);
-                        if (!isValAlreadyInProdsArray){    
-                            this.products.push(docAsProdDoc);
-                        }
-                    });
+                    this.products = querySnapshot.docs.map(doc => ({
+                        id: doc.id, data: doc.data() as ProductDoc["data"]
+                    }));
                 } else {
                 // sets products to init products if theres nothing in products after loading from firebase, and stores the items in firebase.
                     console.log("didn't find products in firebase")
