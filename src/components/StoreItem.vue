@@ -1,7 +1,7 @@
 <template>
     <v-hover v-slot="{ isHovering, props }">
         <v-card :class="{ 'on-hover': isHovering }" :elevation="isHovering ? 16 : 1" style="cursor: pointer;"
-            v-bind="props" class="pa-5" height="525">
+            v-bind="props" class="pa-5" height="600">
 
             <v-card-title><b>{{ product.name }}</b></v-card-title>
             <v-card-text class="pa-3 pl-7">
@@ -15,10 +15,14 @@
             </v-card-text>
             <v-img :src="product.image" alt="image of the item being displayed" height="228px" class="mt-10"></v-img>
             <v-card-text class="px-12 pt-10">{{ product.description }}</v-card-text>
-            <v-btn class="mx-5" @click="deleteProduct()" >
-              <v-icon>mdi-plus</v-icon>
-              Add Product
-            </v-btn>
+
+            <!-- delete button -->
+            <v-card-actions class="justify-end pt-5">
+                <v-btn color="red" @click="deleteProduct()">
+                    <v-icon class="mr-2">mdi-delete</v-icon>
+                    Delete
+                </v-btn>
+            </v-card-actions>
 
         </v-card>
     </v-hover>
@@ -42,6 +46,13 @@ import {
 } from "firebase/firestore";
 
 function deleteProduct() {
+  const confirmation = window.confirm(
+    `Are you sure you want to delete the product: ${product.name}?`
+  );
+  if (!confirmation) {
+    console.log("Deletion canceled by the user.");
+    return;
+  }
   const productName = product.name;
   console.log(productName);
   const myCol: CollectionReference = collection(db, "products");
@@ -52,6 +63,5 @@ function deleteProduct() {
       await (deleteDoc(myDoc));
     })
   });
-  location.reload();
 }
 </script>
