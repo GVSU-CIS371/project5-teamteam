@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import {ProductDoc , Product} from "../types/product";
 import { initProducts } from "../data-init";
 import { db } from '../firebase';
-import { collection, doc, getDocs, QueryDocumentSnapshot, setDoc} from "firebase/firestore";
+import { collection, doc, getDocs, QueryDocumentSnapshot, QuerySnapshot, setDoc} from "firebase/firestore";
 
 // function to be used by the filter function for filtering by category.
 function filterForCategory(item: ProductDoc, category: string) {
@@ -23,41 +23,39 @@ export const useProductStore = defineStore("ProductStore", {
 
     // Setting up our actions.
     actions: {
-        async init() {
+        init() {
             // get the products from firestore
             console.log("Inside init method")
-            const querySnapshot = await getDocs(collection(db, "products"));
-            if (querySnapshot.size > 0){
-                querySnapshot.forEach((doc) => {
-                    const docAsProdDoc: ProductDoc = { id: doc.id, data: doc.data() as ProductDoc["data"] };
-                    // if this item isn't in the array already, then add it, else do nothing since it's already in our array.
-                    console.log("docAsProdDocs:", docAsProdDoc)
-                    const isValAlreadyInProdsArray = ((this.products.some( (product) => { console.log("product id:", product.id, "doc id", docAsProdDoc.id, "comparison:", product.id === docAsProdDoc.id); return product.id === docAsProdDoc.id;})))
-                    console.log("is val already in products array:", isValAlreadyInProdsArray);
-                    if (!isValAlreadyInProdsArray){    
-                        this.products.push(docAsProdDoc);
-                    }
-                });
-            }
-            // sets products to init products if theres nothing in products after loading from firebase, and stores the items in firebase.
-            if (querySnapshot.size == 0) {
-                console.log("didn't find products in firebase")
-                this.products = initProducts;
-                // if the product array was empty then there's nothing in firebase, so we need to update it.
-                this.products.forEach((product) => {
-                    // created the document with the product ID as the primary key.
-                    const docRef = doc(db, "products", product.id);
-                    setDoc(docRef, product.data).then(() => {
-                        console.log('product added was:', product)
-                    })
-                    .catch((err: any) => {
-                        console.log('Rejected adding item:', product, 'due to error:', err);
-                    })
-                    .finally(() => {
-                        console.log('finished uploading to firebase')
-                    })
-                });
-            }
+            getDocs(collection(db, "products")).then( (querySnapshot) => {
+                if (querySnapshot.size > 0){
+                    querySnapshot.forEach((doc) => {
+                        const docAsProdDoc: ProductDoc = { id: doc.id, data: doc.data() as ProductDoc["data"] };
+                        // if this item isn't in the array already, then add it, else do nothing since it's already in our array.
+                        console.log("docAsProdDocs:", docAsProdDoc)
+                        const isValAlreadyInProdsArray = ((this.products.some( (product) => { console.log("product id:", product.id, "doc id", docAsProdDoc.id, "comparison:", product.id === docAsProdDoc.id); return product.id === docAsProdDoc.id;})))
+                        console.log("is val already in products array:", isValAlreadyInProdsArray);
+                        if (!isValAlreadyInProdsArray){    
+                            this.products.push(docAsProdDoc);
+                        }
+                    });
+                } else {
+                // sets products to init products if theres nothing in products after loading from firebase, and stores the items in firebase.
+                    console.log("didn't find products in firebase")
+                    this.products = initProducts;
+                    // if the product array was empty then there's nothing in firebase, so we need to update it.
+                    this.products.forEach((product) => {
+                        // created the document with the product ID as the primary key.
+                        const docRef = doc(db, "products", product.id);
+                        setDoc(docRef, product.data).then(() => {
+                            console.log('product added was:', product)
+                        })
+                        .catch((err: any) => {
+                            console.log('Rejected adding item:', product, 'due to error:', err);
+                        })
+                    });
+                }
+    
+        });
             console.log("init finished, Product array is:", this.products);
         },
 
@@ -66,10 +64,8 @@ export const useProductStore = defineStore("ProductStore", {
             // we have to call this.init() first because if we skipped that step and only filtered then when we use this function to filter
             // electronics and then filter clothing items immediately after, there would be no clothing items because we've
             // already filtered for the electronics items first.
-            this.init().then(() => {
-                this.products = this.products.filter((product) => filterForCategory(product, category))
-                });
-
+            this.init()
+                this.products = this.products.filter((product) => filterForCategory(product, category));
         },
 
         // filter products with ratings above minRating value.
