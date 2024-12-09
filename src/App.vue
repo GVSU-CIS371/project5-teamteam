@@ -106,6 +106,7 @@
 
 // start of additions for add dialog feature
   import {db, collection, addDoc} from "./firebase";
+import { getDocs } from "firebase/firestore";
   const addProductDialog = ref(false);
   const newProduct = ref({
     name: "",
@@ -117,16 +118,33 @@
     stock: 0,
   });
 
+  // if we need to have only number ids as strings for later, can use this function potentially.
+async function newDocIDGenerator(){
+    const allDocs = await getDocs(collection(db, "products"));
+    const allNumsUsed: number[] = []
+    allDocs.forEach( (doc) => {
+        allNumsUsed.push(parseInt(doc.id, 10));
+    })
+    let i = 0
+    while (!allNumsUsed.some((num) =>{
+        num == i
+    })) {
+        i++
+    }
+}
+
 const saveProduct = async () => {
   if (newProduct.value.name && newProduct.value.description && newProduct.value.price > 0) {
     try {
+    //   const newDocID = await newDocIDGenerator();
+    //   console.log("new doc id number value:", newDocID);
       const docRef = await addDoc(collection(db, "products"), {
         name: newProduct.value.name,
         description: newProduct.value.description,
         image: newProduct.value.imgURL,
-        rating: newProduct.value.rating,
-        price: newProduct.value.price,
-        stock: newProduct.value.stock,
+        price: parseInt(newProduct.value.price, 10),
+        rating: parseInt(newProduct.value.rating, 10),
+        stock: parseInt(newProduct.value.stock, 10),
         category: newProduct.value.category,
       });
 
@@ -136,9 +154,9 @@ const saveProduct = async () => {
           name: newProduct.value.name,
           description: newProduct.value.description,
           image: newProduct.value.imgURL,
-          rating: newProduct.value.rating,
-          price: newProduct.value.price,
-          stock: newProduct.value.stock,
+          price: parseInt(newProduct.value.price, 10),
+          rating: parseInt(newProduct.value.rating, 10),
+          stock: parseInt(newProduct.value.stock, 10),
           category: newProduct.value.category,
         },
       });

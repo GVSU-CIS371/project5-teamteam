@@ -112,6 +112,9 @@ import {
 } from "firebase/firestore";
 
 function deleteProduct() {
+console.log(product.name);
+  console.log('Products array before deletion:', productStore.products);
+
   const confirmation = window.confirm(
     `Are you sure you want to delete the product: ${product.name}?`
   );
@@ -120,7 +123,7 @@ function deleteProduct() {
     return;
   }
   const productName = product.name;
-  console.log(productName);
+
   const myCol: CollectionReference = collection(db, "products");
   const qr = query(myCol, where("name", "==", productName));
   getDocs(qr).then((qs: QuerySnapshot) => {
@@ -134,6 +137,8 @@ function deleteProduct() {
   console.log(productStore.products, 'index for product', indexItemAppears);
 //   we want to remove the element from our array, so we will splice it.
     productStore.products.splice(indexItemAppears, 1);
+    console.log('Products array after deletion:', productStore.products);
+
 
 }
 //code for modify
