@@ -7,7 +7,7 @@
             <!-- pass store item props that are needed -->
             <StoreItem :name="item.data.name" :description="item.data.description" :price="item.data.price"
                 :rating="item.data.rating" :stock="item.data.stock" :image="item.data.image"
-                :category="item.data.category" />
+                :category="item.data.category" :id="item.id" />
         </v-col>
     </v-row>
 </template>
@@ -23,5 +23,6 @@ const productStore = useProductStore();
 productStore.filterByCategory("Electronics");
 // get a reference to this data so that our loop can function properly.
 const prodsArray = ref(productStore.products);
+console.log('products loaded are:', productStore.products);
 
 </script>

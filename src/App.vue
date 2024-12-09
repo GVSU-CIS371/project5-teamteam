@@ -97,7 +97,7 @@
   productStore.init()
   // has to be reference so vuetify will work properly.
   const links = ref([
-    { text: "Home", to: "/all", icon: "mdi-home" },
+    { text: "Home", to: "/", icon: "mdi-home" },
     { text: "Electronics", to: "/electronics", icon: "mdi-laptop" },
     { text: "Clothing", to: "/clothing", icon: "mdi-tshirt-crew" },
     { text: "Groceries", to: "/groceries", icon: "mdi-cart" },

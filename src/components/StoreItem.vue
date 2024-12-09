@@ -157,6 +157,7 @@ const modifiedProduct = ref({
   rating: product.rating,
   price: product.price,
   stock: product.stock,
+  id: product.id
 });
 
 function modifyProduct(){
@@ -171,12 +172,10 @@ function modifyProduct(){
   console.log('modifed product new name:', productName);
   const myCol: CollectionReference = collection(db, "products");
   const qr = query(myCol, where("name", "==", modifiedProduct.value.oldName));
-  let itemId = "-1";
-  getDocs(qr).then((qs: QuerySnapshot) => {
-    qs.forEach(async (qd: QueryDocumentSnapshot) => {
-      const myDoc = doc(db, "products", qd.id);
-      itemId = qd.id;
-      await updateDoc(myDoc, {
+  let itemId = product.id;
+  modifyProductDialog.value = false;
+  const docRefToBeUpdated = doc(db, `products/${itemId}`);
+  updateDoc(docRefToBeUpdated, {
         name: productName,
         description: modifiedProduct.value.description,
         price: parseInt(modifiedProduct.value.price, 10),
@@ -184,13 +183,10 @@ function modifyProduct(){
         stock: parseInt(modifiedProduct.value.stock, 10),
         image: modifiedProduct.value.imgURL,
         category: modifiedProduct.value.category,
-      });
-    })
-  });
-  modifyProductDialog.value = false;
-//   we want the UI to update when we modify an item. Let's get the index of the array we need to modify the UI for. 
-  const indexItemAppears = productStore.products.findIndex( (prod) => {
-    return modifiedProduct.value.oldName == prod.data.name});
+      }).then(() => {
+    //   we want the UI to update when we modify an item. Let's get the index of the array we need to modify the UI for. 
+    const indexItemAppears = productStore.products.findIndex( (prod) => {
+    return modifiedProduct.value.id == prod.id});
     // we can use splice to replace this element with itself but with the modified data version. 
     productStore.products.splice(indexItemAppears, 1, {id: itemId, data: {
         name: productName,
@@ -202,6 +198,8 @@ function modifyProduct(){
         category: modifiedProduct.value.category,
       }})
       console.log('modifed product at end of funciton name:', productName);
+
+      })
 
 }
     

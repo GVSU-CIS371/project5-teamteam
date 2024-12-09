@@ -6,7 +6,7 @@
             <!-- pass store item props that are needed -->
             <StoreItem :name="item.data.name" :description="item.data.description" :price="item.data.price"
                 :rating="item.data.rating" :stock="item.data.stock" :image="item.data.image"
-                :category="item.data.category" />
+                :category="item.data.category" :id="item.id" />
         </v-col>
     </v-row>
 </template>
