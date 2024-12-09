@@ -41,7 +41,6 @@
                 label="Product Name"
                 v-model="modifiedProduct.name"
                 required
-                disabled
               ></v-text-field>
               <v-text-field
                 label="Image URL"
@@ -113,8 +112,6 @@ import {
 } from "firebase/firestore";
 
 function deleteProduct() {
-
-
   const confirmation = window.confirm(
     `Are you sure you want to delete the product: ${product.name}?`
   );
@@ -171,25 +168,25 @@ function modifyProduct(){
       await updateDoc(myDoc, {
         name: modifiedProduct.value.name,
         description: modifiedProduct.value.description,
-        price: modifiedProduct.value.price,
-        rating: modifiedProduct.value.rating,
-        stock: modifiedProduct.value.stock,
+        price: parseInt(modifiedProduct.value.price, 10),
+        rating: parseInt(modifiedProduct.value.rating, 10),
+        stock: parseInt(modifiedProduct.value.stock, 10),
         image: modifiedProduct.value.imgURL,
         category: modifiedProduct.value.category,
       });
     })
   });
   modifyProductDialog.value = false;
-//   we want the UI to update when we modify an item. Let's get the index of the array we need to modify the UI for.
+//   we want the UI to update when we modify an item. Let's get the index of the array we need to modify the UI for. 
   const indexItemAppears = productStore.products.findIndex( (prod) => {
     return productName == prod.data.name});
     // we can use splice to replace this element with itself but with the modified data version.
     productStore.products.splice(indexItemAppears, 1, {id: itemId, data: {
         name: modifiedProduct.value.name,
         description: modifiedProduct.value.description,
-        price: modifiedProduct.value.price,
-        rating: modifiedProduct.value.rating,
-        stock: modifiedProduct.value.stock,
+        price: parseInt(modifiedProduct.value.price, 10),
+        rating: parseInt(modifiedProduct.value.rating, 10),
+        stock: parseInt(modifiedProduct.value.stock, 10),
         image: modifiedProduct.value.imgURL,
         category: modifiedProduct.value.category,
       }})
