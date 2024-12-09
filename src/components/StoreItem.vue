@@ -90,10 +90,13 @@
 </template>
 
 <script lang="ts" setup>
-
+import { useProductStore } from "../stores/ProductStore.ts";
 import {ref} from "vue";
 import { Product } from '../types/product';
 const product = defineProps<Product>();
+// Assigning product store to our variable 
+const productStore = useProductStore();
+
 
 import {db} from "../firebase.ts";
 import {
@@ -110,6 +113,8 @@ import {
 } from "firebase/firestore";
 
 function deleteProduct() {
+
+
   const confirmation = window.confirm(
     `Are you sure you want to delete the product: ${product.name}?`
   );
@@ -127,6 +132,12 @@ function deleteProduct() {
       await (deleteDoc(myDoc));
     })
   });
+  const indexItemAppears = productStore.products.findIndex( (prod) => {
+    return product.name == prod.data.name});
+  console.log(productStore.products, 'index for product', indexItemAppears);
+//   we want to remove the element from our array, so we will splice it.
+    productStore.products.splice(indexItemAppears, 1);
+
 }
 //code for modify
 const modifyProductDialog = ref(false);
