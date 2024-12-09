@@ -140,6 +140,7 @@ function deleteProduct() {
 const modifyProductDialog = ref(false);
 const modifiedProduct = ref({
   name: product.name,
+  oldName: product.name,
   imgURL: product.image,
   description: product.description,
   category: product.category,
@@ -157,16 +158,16 @@ function modifyProduct(){
     return;
   }
   const productName = modifiedProduct.value.name;
-  console.log(productName);
+  console.log('modifed product new name:', productName);
   const myCol: CollectionReference = collection(db, "products");
-  const qr = query(myCol, where("name", "==", productName));
+  const qr = query(myCol, where("name", "==", modifiedProduct.value.oldName));
   let itemId = "-1";
   getDocs(qr).then((qs: QuerySnapshot) => {
     qs.forEach(async (qd: QueryDocumentSnapshot) => {
       const myDoc = doc(db, "products", qd.id);
       itemId = qd.id;
       await updateDoc(myDoc, {
-        name: modifiedProduct.value.name,
+        name: productName,
         description: modifiedProduct.value.description,
         price: parseInt(modifiedProduct.value.price, 10),
         rating: parseInt(modifiedProduct.value.rating, 10),
@@ -179,10 +180,10 @@ function modifyProduct(){
   modifyProductDialog.value = false;
 //   we want the UI to update when we modify an item. Let's get the index of the array we need to modify the UI for. 
   const indexItemAppears = productStore.products.findIndex( (prod) => {
-    return productName == prod.data.name});
-    // we can use splice to replace this element with itself but with the modified data version.
+    return modifiedProduct.value.oldName == prod.data.name});
+    // we can use splice to replace this element with itself but with the modified data version. 
     productStore.products.splice(indexItemAppears, 1, {id: itemId, data: {
-        name: modifiedProduct.value.name,
+        name: productName,
         description: modifiedProduct.value.description,
         price: parseInt(modifiedProduct.value.price, 10),
         rating: parseInt(modifiedProduct.value.rating, 10),
@@ -190,6 +191,8 @@ function modifyProduct(){
         image: modifiedProduct.value.imgURL,
         category: modifiedProduct.value.category,
       }})
+      console.log('modifed product at end of funciton name:', productName);
+
 }
     
 </script>
