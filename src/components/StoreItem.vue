@@ -163,9 +163,11 @@ function modifyProduct(){
   console.log(productName);
   const myCol: CollectionReference = collection(db, "products");
   const qr = query(myCol, where("name", "==", productName));
+  let itemId = "-1";
   getDocs(qr).then((qs: QuerySnapshot) => {
     qs.forEach(async (qd: QueryDocumentSnapshot) => {
       const myDoc = doc(db, "products", qd.id);
+      itemId = qd.id;
       await updateDoc(myDoc, {
         name: modifiedProduct.value.name,
         description: modifiedProduct.value.description,
@@ -178,5 +180,19 @@ function modifyProduct(){
     })
   });
   modifyProductDialog.value = false;
+//   we want the UI to update when we modify an item. Let's get the index of the array we need to modify the UI for.
+  const indexItemAppears = productStore.products.findIndex( (prod) => {
+    return productName == prod.data.name});
+    // we can use splice to replace this element with itself but with the modified data version.
+    productStore.products.splice(indexItemAppears, 1, {id: itemId, data: {
+        name: modifiedProduct.value.name,
+        description: modifiedProduct.value.description,
+        price: modifiedProduct.value.price,
+        rating: modifiedProduct.value.rating,
+        stock: modifiedProduct.value.stock,
+        image: modifiedProduct.value.imgURL,
+        category: modifiedProduct.value.category,
+      }})
 }
+    
 </script>
