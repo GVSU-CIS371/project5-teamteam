@@ -92,9 +92,15 @@
 import { useProductStore } from "../stores/ProductStore.ts";
 import {ref} from "vue";
 import { Product } from '../types/product';
-const product = defineProps<Product>();
+type productWithID = Product & {
+    id: string
+}
+
+const product = defineProps<productWithID>();
+
 // Assigning product store to our variable 
 const productStore = useProductStore();
+console.log('this items id:', product.id, 'this items name:', product.name);
 
 
 import {db} from "../firebase.ts";
@@ -124,23 +130,22 @@ console.log(product.name);
   }
   const productName = product.name;
 
-  const myCol: CollectionReference = collection(db, "products");
-  const qr = query(myCol, where("name", "==", productName));
-  getDocs(qr).then((qs: QuerySnapshot) => {
-    qs.forEach(async (qd: QueryDocumentSnapshot) => {
-      const myDoc = doc(db, "products", qd.id);
-      await (deleteDoc(myDoc));
-    })
-  });
-  const indexItemAppears = productStore.products.findIndex( (prod) => {
-    return product.name == prod.data.name});
+//   have to update the delete funciton to delete the document that matches the doc id that we have.
+  const docToDelete = doc(db, `products/${product.id}`);
+  deleteDoc(docToDelete).then(() => {
+    // if item was successfully deleted then we remove it from our array we're referencing.
+    const indexItemAppears = productStore.products.findIndex( (prod) => {
+    return product.id == prod.id});
   console.log(productStore.products, 'index for product', indexItemAppears);
 //   we want to remove the element from our array, so we will splice it.
     productStore.products.splice(indexItemAppears, 1);
     console.log('Products array after deletion:', productStore.products);
-
-
+  })
+  .catch((err: any) => {
+    console.log('Failed to delete item with id:', product.id, 'Error:', err);
+  })
 }
+
 //code for modify
 const modifyProductDialog = ref(false);
 const modifiedProduct = ref({
